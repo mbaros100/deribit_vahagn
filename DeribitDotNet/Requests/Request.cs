@@ -1,0 +1,28 @@
+﻿using DeribitDotNet.Responses;
+
+namespace DeribitDotNet.Requests
+{
+    public abstract class Request
+    {
+        internal bool IsPublic;
+        internal string Method;
+
+        public override string ToString() => $"{nameof(IsPublic)}: {IsPublic}, {nameof(Method)}: {Method}";
+
+        protected static InstrumentKind? AnyAsNull(InstrumentKind instrumentKind) =>
+            instrumentKind != InstrumentKind.Any ? instrumentKind : (InstrumentKind?)null;
+    }
+
+    public abstract class Request<TResponse> : Request where TResponse : Response
+    {
+        protected Request(string method, bool isPublic)
+        {
+            Method = method;
+            IsPublic = isPublic;
+        }
+
+        public override bool Equals(object obj) => obj is Request other && other.Method == Method && other.IsPublic == IsPublic;
+
+        public override int GetHashCode() => Method.GetHashCode() * 17 ^ IsPublic.GetHashCode();
+    }
+}
